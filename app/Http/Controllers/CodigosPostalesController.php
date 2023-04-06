@@ -16,10 +16,16 @@ class CodigosPostalesController extends Controller
 
     public function getCodigoPostal(Request $request, string $codigoPostal = '') {
 
+
+        $codigosPostaes = [];
         if(!empty($codigoPostal)) {
-            return CodigoPostalConverter::where('d_codigo', $codigoPostal)->get();
+            $codigosPostaes = CodigoPostalConverter::where('d_codigo', $codigoPostal);
+                #->where('d_asenta', 'LIKE', "%%")
         }
-        return $codigoPostal;
+        if(!empty($request->get('colonia'))) {
+            $codigosPostaes->where('d_asenta', 'LIKE', '%'.$request->get('colonia').'%');
+        }
+        return $codigosPostaes->get();
     }
 
 
