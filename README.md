@@ -1,26 +1,28 @@
-# Lumen PHP Framework
+# Sepomex Downloader
+Microservicio para descargar el ZIP de codigos postales proporcionado por el servicio postal mexicano
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel/lumen-framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/lumen-framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://img.shields.io/packagist/l/laravel/lumen)](https://packagist.org/packages/laravel/lumen-framework)
+# Acerca del proyecto
+En este proyecto se busca obtimizar el proceso de descargar e importar a una base de datos los codigos postales actualizadados proporcionados por SEPOMEX.
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+Sepomex no proporciona algun servicio web o documentacion para poder descargar dicho zip, sin embargo existe un metodo para poder descargarlo y volvar la informacion a una base de datos. Tambien el zip puede incluir los siguientes formatos que contengan los codigos postales
+- TXT
+- EXCEL
+- XML
 
-> **Note:** In the years since releasing Lumen, PHP has made a variety of wonderful performance improvements. For this reason, along with the availability of [Laravel Octane](https://laravel.com/docs/octane), we no longer recommend that you begin new projects with Lumen. Instead, we recommend always beginning new projects with [Laravel](https://laravel.com).
+Tambien podemos selecionar de que esta condo especificamente queremos los codigs postales o del todo el pais.
 
-## Official Documentation
+# Como funciona
+Si bien SEPOMEX no nos proporciona un servicio, hay una forma de poderlo decargar desde cualquier lenguaje con alguna libreria de HTTP, cuando nosotros selecionamos el estado y el formato, la pagina se llama a si misma para enviar los datos que hemos selecionado, pero no es una peticion de XHR que se pueda ver en el modo desarrollador sino que es de tipo DOC.
 
-Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
+![Formulario_Sepomex](doc/video.gif)
 
-## Contributing
+Sin embargo la peticion envia ciertos tokens y valores para poder realzar la accion. Por alguna razon estos tokens o llaves no caducan, parecieran ser solo para validar que ejecuten dicha accion, ya que al dia de hoy no han caducado.
 
-Thank you for considering contributing to Lumen! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Funcionamiento interno
+El microservicio para poder descargar el archivo realiza la peticion con todos los valores enviados en el navegador, ya internamente estan los valores requeridos para funcionar, ya que incluia mas son completamente innesesarios.
 
-## Security Vulnerabilities
+El microservicio ejecuta la peticion y el contenido enviado es el binario del archivo .ZIP, se valida que la peticion sea correcta, en caso de que no termina el proceso. Despues de validar se guarda el contenido binario en un archivo con nombre aleatorio (sepomex_txt_aleatorio.zip).
 
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+Despues mediante la extension zip valida que el zip sea correcto en caso de que no termina el proceso con un ´Exception´. En caso de que si descomprime el archivo que se encuentra dentro de el. Por el momento esta adaptado solo para el tipo TXT, en este caso leera el contenido despues de la 3 linea del archivo ya que las 3 primeras solo es de informacion de SEPOMEX. Despues de esa linea hara un `explode(contenido)` de toda la linea ya que cada columna esta separado por un `|`, al realizar esta accion empezara a guardar todos los codigos postales en la base de datos configurada.
 
-## License
-
-The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+![Laravel](https://img.shields.io/badge/laravel-%23FF2D20.svg?style=for-the-badge&logo=laravel&logoColor=white)![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)
